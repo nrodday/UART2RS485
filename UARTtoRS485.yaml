@@ -1,0 +1,93 @@
+substitutions:
+  devicename: hamoduleuarttors485
+  friendly_name: HA Module UARTtoRS485
+  device_description: HA Mobile D1Mini Module UARTtoRS485
+
+esphome:
+  name: $devicename
+  comment: ${device_description}
+  platform: ESP8266
+  board: d1_mini
+
+wifi:
+  ssid: "WIFINAME"
+  password: "WIFI_PASSWORD"
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${friendly_name}"
+    password: "AP_PASSWORD"
+
+captive_portal:
+
+# Enable logging
+logger:
+  baud_rate: 0
+
+# Enable Home Assistant API
+api:
+
+ota:
+  - platform: esphome
+    password: "OTA_PASSWORD"
+
+# Setup UART connection, do not change PINs. Change BAUD rate, stop_bits, data_bits, and parity according to your device.
+uart:
+  - id: uart_modbus_client
+    tx_pin: GPIO1
+    rx_pin: GPIO3
+    baud_rate: 4800
+    stop_bits: 1
+    data_bits: 8
+    parity: NONE
+
+# Setup Modbus connection, do not change PINs.
+modbus:
+  - uart_id: uart_modbus_client
+    flow_control_pin: GPIO0
+    id: modbus_client
+
+# Setup Modbus connection, change Modbus device address, if necessary.
+modbus_controller:
+- id: modbus_device
+  address: 0x1   ## address of the Modbus slave device on the bus
+  modbus_id: modbus_client
+  setup_priority: -10
+  update_interval: 5s
+
+sensor:
+  - platform: wifi_signal
+    name: "${friendly_name} WiFi Signal"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "${friendly_name} Uptime"
+    update_interval: 60s
+
+  #measures the voltage at the chip, not the VCC pin of the board
+  - platform: adc
+    pin: VCC
+    name: "${friendly_name} VCC Voltage"
+    update_interval: 60s
+
+  #Read humidity value from TH04S sensor, change name and address according to your device.
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "${friendly_name} CWT-TH04S-Hum"
+    register_type: holding
+    address: 0x0    ## address of the register inside the Modbus slave device
+    unit_of_measurement: "%"
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  #Read temperature value from TH04S sensor, change name and address according to your device.
+  - platform: modbus_controller
+    modbus_controller_id: modbus_device
+    name: "${friendly_name} CWT-TH04S-Temp"
+    register_type: holding
+    address: 0x1    ## address of the register inside the Modbus slave device
+    unit_of_measurement: "C"
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
