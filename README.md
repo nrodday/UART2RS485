@@ -31,4 +31,4 @@ HA Module UARTtoRS485 - YOUR CONTROL NAME
 
 4. You can now read/write from/to the predefined registers of your device from HomeAssistant. E.g. if you read a sensor value every 60 seconds, it will be shown in HomeAssistant, or if you attach a write action to a button in your HomeAssistant GUI and push the button, the respective write action to your RS485 device will be executed.
 
-
+<a href="https://www.tindie.com/products/nilsrodday/wemos-d1-mini-shield-uart-to-rs485/"><img src="https://d2ss6ovg47m0r5.cloudfront.net/badges/tindie-larges.png" alt="I sell on Tindie" width="200" height="104"></a>
